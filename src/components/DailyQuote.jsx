@@ -80,8 +80,8 @@ const DailyQuote = () => {
           </motion.div>
         )}
 
-        <p className="mt-16 text-yellow-500 text-center">
-          Come back tomorrow for new verses and hadith.
+        <p className="mt-16 -mb-16 text-yellow-500 text-center">
+          [Come back tomorrow for new verses and hadith]
         </p>
       </div>
     </motion.div>

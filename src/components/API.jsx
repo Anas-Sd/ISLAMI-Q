@@ -2,187 +2,317 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import referenceData from "../assets/ReferenceData";
 
 const API = () => {
-  const [user, setUser] = useState(null);
-  const [activeTab, setActiveTab] = useState("aayah");
-  const [value, setValue] = useState("");
-  const [result, setResult] = useState(null);
-  const [englishResult, setEnglishResult] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [loadingEnglish, setLoadingEnglish] = useState(false);
-  const [error, setError] = useState("");
-  const [showEnglishButton, setShowEnglishButton] = useState(false);
-  const [showClear, setShowClear] = useState(false);
+    const [user, setUser] = useState(null);
+    const [activeTab, setActiveTab] = useState("aayah");
+    const [value, setValue] = useState("");
+    const [result, setResult] = useState(null);
+    const [englishResult, setEnglishResult] = useState(null);
+    const [loading, setLoading] = useState(false);
+    const [loadingEnglish, setLoadingEnglish] = useState(false);
+    const [error, setError] = useState("");
+    const [showEnglishButton, setShowEnglishButton] = useState(false);
+    const [showClear, setShowClear] = useState(false);
+    const [showPageMsg, setShowPageMsg] = useState(false);
+    const [showButtons, setShowButtons] = useState(false);
+    const [block, setBlock] = useState(false);
 
-  useEffect(() => {
-    const getSessionUser = async () => {
-      const { data } = await supabase.auth.getSession();
-      setUser(data.session?.user ?? null);
+    useEffect(() => {
+        if (activeTab === "page")
+            setShowPageMsg(true);
+        else
+            setShowPageMsg(false)
+        
+    }, [activeTab]);
+    useEffect(() => {
+        const getSessionUser = async () => {
+            const { data } = await supabase.auth.getSession();
+            setUser(data.session?.user ?? null);
+        };
+
+        getSessionUser();
+
+        const { data: authListener } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                setUser(session?.user ?? null);
+            }
+        );
+
+        return () => {
+            authListener.subscription.unsubscribe();
+        };
+    }, []);
+
+    const tabs = [
+        { id: "aayah", label: "Aayah", placeholder: "Enter ayah number (1 - 6236)" },
+        { id: "surah", label: "Surah", placeholder: "Enter surah number (1 - 114)" },
+        { id: "ruku", label: "Ruku", placeholder: "Enter ruku number E.g (2 : 40)" },
+        { id: "page", label: "Page", placeholder: "Enter page number (1 - 604)" },
+    ];
+
+    const currentTab = tabs.find((tab) => tab.id === activeTab);
+
+    const handleSearchWithValue = async (searchValue) => {
+        if (!user) {
+            setError("Please login to use this feature.");
+            return;
+        }
+
+        let url = "";
+
+        if (activeTab === "aayah") {
+            url = `https://api.alquran.cloud/v1/ayah/${searchValue}/quran-uthmani`;
+        }
+
+        if (activeTab === "surah") {
+            url = `https://api.alquran.cloud/v1/surah/${searchValue}/quran-uthmani`;
+        }
+
+        if (activeTab === "page") {
+            url = `https://api.alquran.cloud/v1/page/${searchValue}/quran-uthmani`;
+        }
+
+        if(activeTab === "ruku")
+            setBlock(true);
+
+        try {
+            setLoading(true);
+            setError("");
+            setResult(null);
+
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (data.code !== 200) {
+                throw new Error("Invalid input");
+            }
+
+            setResult(data.data);
+            setShowEnglishButton(true);
+            setShowButtons(true);
+
+        } catch {
+            setError("Something went wrong.");
+        } finally {
+            setLoading(false);
+        }
     };
 
-    getSessionUser();
+    const handleSearch = async () => {
+        if (!user) {
+            setError("Please login to use this feature.");
+            setResult(null);
+            return;
+        }
+        if (!value) {
+            setError("Please Enter a Value");
+            return;
+        }
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
-      }
-    );
+        let url = "";
 
-    return () => {
-      authListener.subscription.unsubscribe();
+        if (activeTab === "aayah") {
+            url = `https://api.alquran.cloud/v1/ayah/${value}/quran-uthmani`;
+        }
+
+        if (activeTab === "surah") {
+            if (value < 1 || value > 114) {
+                setResult(null);
+                setShowEnglishButton(false);
+                setError("Enter a valid page No");
+                return;
+            }
+            url = `https://api.alquran.cloud/v1/surah/${value}/quran-uthmani`;
+        }
+
+        if (activeTab === "ruku") {
+
+            if (!value.includes(":")) {
+                setError("Enter format Surah:Ruku (example 17:1)");
+                return;
+            }
+
+            const [surah, ruku] = value.split(":").map(Number);
+
+            const surahInfo = referenceData.surahData.find(
+                (s) => s.number === surah
+            );
+
+            if (!surahInfo) {
+                setError("Invalid Surah");
+                return;
+            }
+
+            const totalRukusInSurah =
+                (surahInfo.rukuEnd+1) - surahInfo.rukuStart;
+
+            if (surah == 28 && ruku == 9) {
+                setError("The 9th ruku of surah 28 is merged with 8th ruku, So Please check 8th ruku of surah 28")
+                setResult("");
+                setEnglishResult("");
+                return;
+            }
+
+            if (ruku < 1 || ruku > totalRukusInSurah) {
+                setError("Invalid Ruku number for this Surah");
+                setResult("");
+                setEnglishResult("");
+                return;
+            }
+
+            const globalRuku =
+                (surahInfo.rukuStart + 1) + (ruku - 1);
+
+            url = `https://api.alquran.cloud/v1/ruku/${globalRuku}/quran-uthmani`;
+        }
+
+        if (activeTab === "page") {
+            if (value < 1 || value > 604) {
+                setResult(null);
+                setShowEnglishButton(false);
+                setError("Enter a valid page No");
+                return;
+            }
+            url = `https://api.alquran.cloud/v1/page/${value}/quran-uthmani`;
+        }
+
+        try {
+            setLoading(true);
+            setError("");
+            setResult(null);
+            setEnglishResult(null);
+            setShowEnglishButton(false);
+            setShowClear(false);
+
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (data.code !== 200) {
+                throw new Error("Invalid input");
+            }
+
+            setResult(data.data);
+            setShowEnglishButton(true);
+            setShowButtons(true);
+            setShowClear(true);
+        } catch (error) {
+            setError("Something went wrong. Check your input.");
+            console.log(error)
+        } finally {
+            setLoading(false);
+        }
     };
-  }, []);
 
-  const tabs = [
-    { id: "aayah", label: "Aayah", placeholder: "Enter ayah number (1 - 6236)" },
-    { id: "surah", label: "Surah", placeholder: "Enter surah number (1 - 114)" },
-    { id: "ruku", label: "Ruku", placeholder: "Enter ruku number (1 - 558)" },
-    { id: "page", label: "Page", placeholder: "Enter page number (1 - 604)" },
-  ];
-
-  const currentTab = tabs.find((tab) => tab.id === activeTab);
-
-  const handleSearch = async () => {
-    if (!user) {
-      setError("Please login to use this feature.");
-      setResult(null);
-      return;
-    }
-    if (!value) {
-      setError("Please Enter a Value");
-      return;
-    }
-
-    let url = "";
-
-    if (activeTab === "aayah") {
-      if (value < 1 || value > 6236) {
+    const handleClear = async () => {
         setResult(null);
+        setEnglishResult(null);
+        setError(null);
         setShowEnglishButton(false);
-        setError("Enter a valid page No");
-        return;
-      }
-      url = `https://api.alquran.cloud/v1/ayah/${value}/quran-uthmani`;
-    }
+        setShowClear(false);
+        setValue("");
+        setShowButtons(false);
+    };
 
-    if (activeTab === "surah") {
-      if (value < 1 || value > 114) {
-        setResult(null);
-        setShowEnglishButton(false);
-        setError("Enter a valid page No");
-        return;
-      }
-      url = `https://api.alquran.cloud/v1/surah/${value}/quran-uthmani`;
-    }
+    const handleGenerateEnglish = async () => {
+        if (!value) return;
 
-    if (activeTab === "ruku") {
-      if (value < 1 || value > 558) {
-        setResult(null);
-        setShowEnglishButton(false);
-        setError("Enter a valid page No");
-        return;
-      }
-      url = `https://api.alquran.cloud/v1/ruku/${value}/quran-uthmani`;
-    }
+        let url = "";
 
-    if (activeTab === "page") {
-      if (value < 1 || value > 604) {
-        setResult(null);
-        setShowEnglishButton(false);
-        setError("Enter a valid page No");
-        return;
-      }
-      url = `https://api.alquran.cloud/v1/page/${value}/quran-uthmani`;
-    }
+        if (activeTab === "page") {
+            url = `https://api.alquran.cloud/v1/page/${value}/en.asad`;
+        }
 
-    try {
-      setLoading(true);
-      setError("");
-      setResult(null);
-      setEnglishResult(null);
-      setShowEnglishButton(false);
-      setShowClear(false);
+        if (activeTab === "aayah") {
+            url = `https://api.alquran.cloud/v1/ayah/${value}/en.asad`;
+        }
 
-      const res = await fetch(url);
-      const data = await res.json();
+        if (activeTab === "surah") {
+            url = `https://api.alquran.cloud/v1/surah/${value}/en.asad`;
+        }
 
-      if (data.code !== 200) {
-        throw new Error("Invalid input");
-      }
+        if (activeTab === "ruku") {
 
-      setResult(data.data);
-      setShowEnglishButton(true);
-      setShowClear(true);
-    } catch {
-      setError("Something went wrong. Check your input.");
-    } finally {
-      setLoading(false);
-    }
-  };
+            if (!value.includes(":")) {
+                setError("Enter format Surah:Ruku (example 17:1)");
+                return;
+            }
 
-  const handleClear = async () => {
-    setResult(null);
-    setEnglishResult(null);
-    setError(null);
-    setShowEnglishButton(false);
-    setShowClear(false);
-    setValue("");
-  };
+            const [surah, ruku] = value.split(":").map(Number);
 
-  const handleGenerateEnglish = async () => {
-    if (!value) return;
+            const surahInfo = referenceData.surahData.find(
+                (s) => s.number === surah
+            );
 
-    let url = "";
+            if (!surahInfo) {
+                setError("Invalid Surah");
+                return;
+            }
 
-    if (activeTab === "page") {
-      url = `https://api.alquran.cloud/v1/page/${value}/en.asad`;
-    }
-    if (activeTab === "aayah") {
-      url = `https://api.alquran.cloud/v1/ayah/${value}/en.asad`;
-    }
-    if (activeTab === "surah") {
-      url = `https://api.alquran.cloud/v1/surah/${value}/en.asad`;
-    }
-    if (activeTab === "ruku") {
-      url = `https://api.alquran.cloud/v1/ruku/${value}/en.asad`;
-    }
+            if (surah === 28 && ruku === 9) {
+                setError("The 9th ruku of surah 28 is merged with 8th ruku.");
+                return;
+            }
 
-    try {
-      setLoadingEnglish(true);
-      const res = await fetch(url);
-      const data = await res.json();
-      setEnglishResult(data.data);
-    } catch {
-      setError("Failed to load English translation.");
-    } finally {
-      setLoadingEnglish(false);
-    }
-  };
+            const totalRukusInSurah =
+                surahInfo.rukuEnd - surahInfo.rukuStart + 1;
 
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      whileInView={{ opacity: 1 }}
-      transition={{ duration: 0.6 }}
-      viewport={{ once: true }}
-      className="min-h-screen bg-gradient-to-br from-[#0f2e23] via-[#0b241c] to-[#061612] text-white flex items-center justify-center px-6"
-    >
-      <motion.div
-        initial={{ y: 40 }}
-        whileInView={{ y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-        className="w-full max-w-3xl"
-      >
-        <p className="text-yellow-500 text-center text-medium mb-4 tracking-wide">
-          ✦ ا ستكشف القرآن بدقة  ✦
-        </p>
+            if (ruku < 1 || ruku > totalRukusInSurah) {
+                setError("Invalid Ruku number for this Surah");
+                return;
+            }
+
+            const globalRuku =
+                (surahInfo.rukuStart + 1) + (ruku - 1);
+
+            url = `https://api.alquran.cloud/v1/ruku/${globalRuku}/en.asad`;
+        }
+
+        try {
+            setLoadingEnglish(true);
+            setError("");
+            setEnglishResult(null);
+
+            const res = await fetch(url);
+            const data = await res.json();
+
+            if (data.code !== 200) {
+                throw new Error("Invalid input");
+            }
+
+            setEnglishResult(data.data);
+
+        } catch (error) {
+            setError("Failed to load English translation.");
+        } finally {
+            setLoadingEnglish(false);
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            transition={{ duration: 0.6 }}
+            viewport={{ once: true }}
+            className="min-h-screen bg-gradient-to-br from-[#0f2e23] via-[#0b241c] to-[#061612] text-white flex items-center justify-center px-6"
+        >
+            <motion.div
+                initial={{ y: 40 }}
+                whileInView={{ y: 0 }}
+                transition={{ duration: 0.6 }}
+                viewport={{ once: true }}
+                className="w-full max-w-3xl"
+            >
+                <p className="text-yellow-500 text-center text-medium mb-4 tracking-wide">
+                    ✦ ا ستكشف القرآن بدقة  ✦
+                </p>
                 <h1 className="text-3xl sm:text-4xl md:text-5xl font-serif font-semibold text-center mb-10">
-  Explore the{" "}
-  <span className="text-yellow-500">Quran</span>{" "}
-  with Precision
-</h1>
+                    Explore the{" "}
+                    <span className="text-yellow-500">Quran</span>{" "}
+                    with Precision
+                </h1>
                 <div className="mt-8 bg-[#0e2a21] border border-yellow-500/30 rounded-2xl p-6">
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-[#13372b] rounded-xl p-2 mb-6">
                         {tabs.map((tab) => (
@@ -197,8 +327,8 @@ const API = () => {
                                     setShowEnglishButton(false);
                                 }}
                                 className={`w-full px-4 py-2 rounded-lg text-sm transition ${activeTab === tab.id
-                                        ? "bg-yellow-500 text-black"
-                                        : "text-gray-300"
+                                    ? "bg-yellow-500 text-black"
+                                    : "text-gray-300"
                                     }`}
                             >
                                 {tab.label}
@@ -206,7 +336,9 @@ const API = () => {
                         ))}
                     </div>
 
-
+                    {activeTab === "page" && (
+                        <p className="text-yellow-500 text-[0.2cm] -mt-4 text-center mb-4 sm:text-sm block">[This Quran is from "Uthmani's" Edition so the pages will be from the respective book]</p>
+                    )}
                     {/* Input */}
                     <div className="flex flex-col sm:flex-row gap-4">
                         <input
@@ -250,16 +382,37 @@ const API = () => {
                         {showClear && (
                             <button
                                 onClick={handleClear}
-                                className="flex-[1] bg-green-600 hover:bg-green-500 text-white py-3 rounded-lg font-medium transition"
+                                className="flex-[1] bg-green-500 hover:bg-green-600 text-white py-3 rounded-lg font-medium transition"
                             >
                                 Clear
                             </button>
                         )}
 
                     </div>
+                    {showButtons && (
+                        <div className=" grid grid-cols-2 gap-2 text-black font-semibold">
+                            <button
+                                onClick={() => {
+                                    const newValue = Number(value) - 1;
+                                    setValue(newValue);
+                                    handleSearchWithValue(newValue);
+                                }}
+                                className="rounded-lg bg-yellow-400 hover:bg-yellow-500 h-10">prev</button>
+                            <button
+                                onClick={() => {
+                                    const newValue = Number(value) + 1;
+                                    setValue(newValue);
+                                    handleSearchWithValue(newValue);
+                                }}
+                                className="rounded-lg bg-yellow-400 hover:bg-yellow-500 h-10"
+                            >
+                                Next
+                            </button>
+                        </div>
+                    )}
 
                     {/* Result */}
-                    <div className="mt-5 border border-dashed border-gray-600 rounded-xl p-6 text-sm space-y-6">
+                    <div className="mt-5 border border-dashed border-gray-600 rounded-xl p-6 text-2xl sm:text-xl space-y-6">
 
                         {error && <p className="text-red-400">{error}</p>}
 
@@ -303,9 +456,9 @@ const API = () => {
 
 
                 </div>
-      </motion.div>
-    </motion.div>
-  );
+            </motion.div>
+        </motion.div>
+    );
 };
 
 export default API;

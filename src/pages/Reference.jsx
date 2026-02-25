@@ -37,6 +37,7 @@ const Reference = () => {
         {/* Table Rows */}
         {surahData.map((surah, index) => {
           const ayahRange = aayahData[index];
+          
 
           return (
             <div
@@ -58,7 +59,8 @@ const Reference = () => {
 
               {/* ✅ Ruku from surahData */}
               <span>
-                {surah.rukuStart} - {surah.rukuEnd}
+                
+                1 - {surah.rukuEnd - surah.rukuStart + 1}
               </span>
             </div>
           );

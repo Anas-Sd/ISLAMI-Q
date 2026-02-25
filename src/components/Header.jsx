@@ -6,23 +6,48 @@ const Header = () => {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    const getSessionUser = async () => {
-      const { data } = await supabase.auth.getSession();
-      setUser(data.session?.user ?? null);
-    };
+  let logoutTimer;
 
-    getSessionUser();
+  const startLogoutTimer = () => {
+    if (logoutTimer) clearTimeout(logoutTimer);
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (_event, session) => {
-        setUser(session?.user ?? null);
+    logoutTimer = setTimeout(async () => {
+      await supabase.auth.signOut();
+      setUser(null);
+      alert("Session expired. Please login again.");
+    }, 45 * 60 * 1000); // 45 minutes
+  };
+
+  const getSessionUser = async () => {
+    const { data } = await supabase.auth.getSession();
+    const currentUser = data.session?.user ?? null;
+    setUser(currentUser);
+
+    if (currentUser) {
+      startLogoutTimer();
+    }
+  };
+
+  getSessionUser();
+
+  const { data: authListener } = supabase.auth.onAuthStateChange(
+    (_event, session) => {
+      const currentUser = session?.user ?? null;
+      setUser(currentUser);
+
+      if (currentUser) {
+        startLogoutTimer();
+      } else {
+        if (logoutTimer) clearTimeout(logoutTimer);
       }
-    );
+    }
+  );
 
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
-  }, []);
+  return () => {
+    if (logoutTimer) clearTimeout(logoutTimer);
+    authListener.subscription.unsubscribe();
+  };
+}, []);
 
   const displayName =
     user?.user_metadata?.full_name ||
@@ -47,9 +72,9 @@ const Header = () => {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
-              className="text-yellow-400 text-xl mb-6 text-base sm:text-4xl"
+              className="text-yellow-400 mb-6 font-bold text-base sm:text-4xl"
             >
-              Assalamu Alaikum, {displayName}
+              Assalamu Alaikum, <span className="text-white font-bold">{displayName}</span>
             </motion.p>
           )}
 
@@ -65,14 +90,15 @@ const Header = () => {
           <p className="mt-6 text-gray-400 text-base sm:text-lg">
             Find any Surah, Aayah, Rukuh or Page instantly — just enter a number and explore the Holy Quran.
           </p>
-
+            <a href="#api">
           <motion.button
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             className="mt-8 px-8 py-3 bg-yellow-500 text-black rounded-xl font-medium"
           >
-            <a href="#api">Start Exploring</a>
+            Start Exploring
           </motion.button>
+          </a>
         </div>
       </motion.div>
     </motion.section>

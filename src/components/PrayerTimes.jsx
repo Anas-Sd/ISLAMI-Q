@@ -70,6 +70,7 @@ const PrayerTimes = () => {
           ))}
         </div>
       </div>
+      <p className="-mb-16 mt-16 text-center text-yellow-400">[Accurate Timing with Live updates According to Al - Adhan]</p>
     </motion.div>
   );
 };
