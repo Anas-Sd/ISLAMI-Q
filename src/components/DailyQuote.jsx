@@ -63,7 +63,7 @@ const DailyQuote = () => {
             className="mt-8 border border-yellow-500/20 rounded-2xl p-8 bg-[#0e2a21]"
           >
             <p className="text-yellow-500 font-medium mb-4">
-              Hadith of the Day
+              Hadeeth of the Day
             </p>
 
             <p className="text-2xl sm:text-3xl leading-loose mb-6">
@@ -81,7 +81,7 @@ const DailyQuote = () => {
         )}
 
         <p className="mt-16 -mb-16 text-yellow-500 text-center">
-          [Come back tomorrow for new verses and hadith]
+          [Come back tomorrow for new verses and hadeeth]
         </p>
       </div>
     </motion.div>

@@ -389,7 +389,7 @@ const API = () => {
                         )}
 
                     </div>
-                    {showButtons && (
+                    {showButtons && activeTab!=="ruku" && (
                         <div className=" grid grid-cols-2 gap-2 text-black font-semibold">
                             <button
                                 onClick={() => {
