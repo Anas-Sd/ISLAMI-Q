@@ -2,12 +2,12 @@ import React from "react";
 import { motion } from "framer-motion";
 import ScrollToTop from "./ScrollToTop";
 const Footer = () => {
-const handleScrollTop = () => {
-  window.scrollTo({
-    top: 0,
-    behavior: "smooth",
-  });
-};
+  const handleScrollTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  };
   return (
     <motion.footer
       initial={{ opacity: 0 }}
@@ -20,17 +20,17 @@ const handleScrollTop = () => {
         <p className="text-yellow-500 text-sm mb-3">
           السلام عليكم ورحمة الله وبركاته
         </p>
-        <div  onClick={handleScrollTop} className="cursor-pointer">
-        <h1 className="text-2xl sm:text-3xl font-serif text-white relative inline-block">
-          Islami
-          <span className="relative text-yellow-500 sm:text-[0.8cm] text-[0.6cm] font-bold text-4xl">
-            Q
-            <span className="absolute -top-2 sm:left-2 left-1 text-xs">
-              ••
+        <div onClick={handleScrollTop} className="cursor-pointer">
+          <h1 className="text-2xl sm:text-3xl font-serif text-white relative inline-block">
+            Islami
+            <span className="relative text-yellow-500 sm:text-[0.8cm] text-[0.6cm] font-bold text-4xl">
+              Q
+              <span className="absolute -top-2 sm:left-2 left-1 text-xs">
+                ••
+              </span>
             </span>
-          </span>
-        </h1>
-        </div>  
+          </h1>
+        </div>
 
         <p className="text-gray-400 mt-3 text-sm">
           A tool to explore the Holy Quran — by aayah, surah, ruku or page.

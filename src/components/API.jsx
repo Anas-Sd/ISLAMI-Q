@@ -25,7 +25,7 @@ const API = () => {
             setShowPageMsg(true);
         else
             setShowPageMsg(false)
-        
+
     }, [activeTab]);
     useEffect(() => {
         const getSessionUser = async () => {
@@ -75,7 +75,7 @@ const API = () => {
             url = `https://api.alquran.cloud/v1/page/${searchValue}/quran-uthmani`;
         }
 
-        if(activeTab === "ruku")
+        if (activeTab === "ruku")
             setBlock(true);
 
         try {
@@ -103,8 +103,8 @@ const API = () => {
 
     const handleSearch = async () => {
         trackEvent("go_clicked", {
-  tab: activeTab,
-});
+            tab: activeTab,
+        });
         if (!user) {
             setError("Please login to use this feature.");
             setResult(null);
@@ -150,7 +150,7 @@ const API = () => {
             }
 
             const totalRukusInSurah =
-                (surahInfo.rukuEnd+1) - surahInfo.rukuStart;
+                (surahInfo.rukuEnd + 1) - surahInfo.rukuStart;
 
             if (surah == 28 && ruku == 9) {
                 setError("The 9th ruku of surah 28 is merged with 8th ruku, So Please check 8th ruku of surah 28")
@@ -220,9 +220,9 @@ const API = () => {
     };
 
     const handleGenerateEnglish = async () => {
-        trackEvent("generate_english_clicked",  {
-  tab: activeTab,
-});
+        trackEvent("generate_english_clicked", {
+            tab: activeTab,
+        });
         if (!value) return;
 
         let url = "";
@@ -397,7 +397,7 @@ const API = () => {
                         )}
 
                     </div>
-                    {showButtons && activeTab!=="ruku" && (
+                    {showButtons && activeTab !== "ruku" && (
                         <div className=" grid grid-cols-2 gap-2 text-black font-semibold">
                             <button
                                 onClick={() => {
