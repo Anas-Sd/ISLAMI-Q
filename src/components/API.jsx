@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { supabase } from "../supabaseClient";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { trackEvent } from "../assets/analytics";
 import referenceData from "../assets/ReferenceData";
 
 const API = () => {
@@ -101,6 +102,9 @@ const API = () => {
     };
 
     const handleSearch = async () => {
+        trackEvent("go_clicked", {
+  tab: activeTab,
+});
         if (!user) {
             setError("Please login to use this feature.");
             setResult(null);
@@ -216,6 +220,9 @@ const API = () => {
     };
 
     const handleGenerateEnglish = async () => {
+        trackEvent("generate_english_clicked",  {
+  tab: activeTab,
+});
         if (!value) return;
 
         let url = "";
@@ -372,6 +379,7 @@ const API = () => {
 
                         <Link
                             to={"/reference"}
+                            onClick={() => trackEvent("reference_clicked")}
                             className={`${showClear ? "flex-[3]" : "w-full"}`}
                         >
                             <button className="w-full bg-green-600 hover:bg-green-700 text-white py-3 rounded-lg font-medium transition">
