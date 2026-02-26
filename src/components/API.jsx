@@ -47,7 +47,7 @@ const API = () => {
     }, []);
 
     const tabs = [
-        { id: "aayah", label: "Aayah", placeholder: "Enter ayah number (1 - 6236)" },
+        { id: "aayah", label: "Aayah", placeholder: "E.g. (1 - 6236) or (2: 10)" },
         { id: "surah", label: "Surah", placeholder: "Enter surah number (1 - 114)" },
         { id: "ruku", label: "Ruku", placeholder: "Enter ruku number E.g (2 : 40)" },
         { id: "page", label: "Page", placeholder: "Enter page number (1 - 604)" },
