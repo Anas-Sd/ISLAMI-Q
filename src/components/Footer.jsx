@@ -43,6 +43,17 @@ const Footer = () => {
           <a href="#features">Features</a>
           <a href="#quote">Hadeeth</a>
         </div>
+        <div className="mt-6">
+  <a
+    href="mailto:queries.islamiq@gmail.com"
+    className="text-gray-400 text-xs sm:text-sm  transition duration-300"
+  >
+    For queries, suggestions, or feedback:
+    <span className="block sm:inline sm:ml-1 text-yellow-500">
+      queries.islamiq@gmail.com
+    </span>
+  </a>
+</div>
 
         <div className="mt-8 border-t border-yellow-500/10 pt-6 text-gray-500 text-sm">
           Made with ❤️ for the Ummah • 2026
