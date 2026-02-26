@@ -70,7 +70,7 @@ const PrayerTimes = () => {
           ))}
         </div>
       </div>
-      <p className="-mb-16 mt-16 text-center text-yellow-400">[Accurate Timing with Live updates According to Al - Adhan]</p>
+      <p className="-mb-16 mt-16 text-sm sm:text-base text-center text-yellow-400">[Accurate Salah Timings with Live updates According to Al - Adhan]</p>
     </motion.div>
   );
 };
