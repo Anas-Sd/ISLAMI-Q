@@ -3,7 +3,6 @@
 @tailwind utilities;
 
 
-
 .perspective {
   perspective: 1200px;
 }
@@ -207,4 +206,12 @@
 
 html {
   scroll-behavior: smooth;
+}
+
+.bgtext {
+  background-image: url("https://static.vecteezy.com/system/resources/previews/021/689/614/original/beautiful-quran-cover-design-floral-frames-colors-abstract-quran-kareem-al-quran-islamic-book-cover-vector.jpg");
+  background-size: cover;
+  background-position: center;
+  -webkit-background-clip: text;
+  color: transparent;
 }
