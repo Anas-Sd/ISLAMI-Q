@@ -81,6 +81,22 @@ const Header = () => {
           transition={{ duration: 0.8 }}
           className="w-full max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-16"
         >
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 3, ease: "easeInOut" }}
+            className="sm:hidden block items-center justify-center -mt-20" >
+            <h1 className="text-7xl lg:text-9xl font-bold flex items-end bgtext">
+              <span>ISLAMI</span>
+              <span className="relative inline-block ml-1">
+                <span className="bgtext">Q</span>
+                <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1">
+                  <span className="w-3 h-3 bg-white rounded-full"></span>
+                  <span className="w-3 h-3 bg-white rounded-full"></span>
+                </span>
+              </span>
+            </h1>
+          </motion.div>
           <div className="text-center md:text-left max-w-xl">
             {displayName && (
               <motion.p
@@ -117,6 +133,22 @@ const Header = () => {
               </motion.button>
             </a>
           </div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 3, ease: "easeInOut" }}
+            className="hidden sm:block items-center justify-center -mt-20" >
+            <h1 className="text-7xl lg:text-9xl font-bold flex items-end bgtext">
+              <span>ISLAMI</span>
+              <span className="relative inline-block ml-1">
+                <span className="bgtext">Q</span>
+                <span className="absolute -top-4 left-1/2 -translate-x-1/2 flex gap-1">
+                  <span className="w-3 h-3 bg-white rounded-full"></span>
+                  <span className="w-3 h-3 bg-white rounded-full"></span>
+                </span>
+              </span>
+            </h1>
+          </motion.div>
         </motion.div>
       </motion.section>
     </>
