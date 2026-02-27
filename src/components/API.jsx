@@ -64,14 +64,41 @@ const API = () => {
         let url = "";
 
         if (activeTab === "aayah") {
+            if (!searchValue.includes(":")) {
+        const num = Number(searchValue);
+        if (num < 1 || num > 6236) {
+            setError(`There is no aayah number ${searchValue}`);
+            setShowEnglishButton(false);
+            setResult(false);
+            return;
+        }
+    }
             url = `https://api.alquran.cloud/v1/ayah/${searchValue}/quran-uthmani`;
         }
 
-        if (activeTab === "surah") {
-            url = `https://api.alquran.cloud/v1/surah/${searchValue}/quran-uthmani`;
-        }
+       if (activeTab === "surah") {
+
+    const num = Number(searchValue);
+
+    if (num < 1 || num > 114) {
+        setError(`There is no surah number ${searchValue}`);
+        setShowEnglishButton(false);
+        setResult(null);
+        return;
+    }
+
+    url = `https://api.alquran.cloud/v1/surah/${searchValue}/quran-uthmani`;
+}
 
         if (activeTab === "page") {
+            const num = Number(searchValue);
+
+    if (num < 1 || num > 604) {
+        setError(`There is no page number ${searchValue}`);
+        setShowEnglishButton(false);
+        setResult(null);
+        return;
+    }
             url = `https://api.alquran.cloud/v1/page/${searchValue}/quran-uthmani`;
         }
 
@@ -95,7 +122,7 @@ const API = () => {
             setShowButtons(true);
 
         } catch {
-            setError("Something went wrong.");
+            setError("Something went wronggg.");
         } finally {
             setLoading(false);
         }
@@ -118,6 +145,13 @@ const API = () => {
         let url = "";
 
         if (activeTab === "aayah") {
+            if(value<1 || value>6236)
+            {
+                setError(`There is no aayah number ${value}`)
+                setShowEnglishButton(false)
+                setResult(false)
+                return
+            }
             url = `https://api.alquran.cloud/v1/ayah/${value}/quran-uthmani`;
         }
 
@@ -125,7 +159,7 @@ const API = () => {
             if (value < 1 || value > 114) {
                 setResult(null);
                 setShowEnglishButton(false);
-                setError("Enter a valid page No");
+                setError("Enter a valid Surah No");
                 return;
             }
             url = `https://api.alquran.cloud/v1/surah/${value}/quran-uthmani`;
@@ -382,7 +416,7 @@ const API = () => {
                     {/* Input */}
                     <div className="flex flex-col sm:flex-row gap-4">
                         <input
-                            type="text"
+                            type="number"
                             value={value}
                             onChange={(e) => setValue(e.target.value)}
                             placeholder={currentTab.placeholder}
