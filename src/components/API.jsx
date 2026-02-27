@@ -297,6 +297,39 @@ const API = () => {
         }
     };
 
+    const getNextAyah = (input) => {
+        if (!input.includes(":")) {
+            return String(Number(input) + 1);
+        }
+
+        const [surah, ayah] = input.split(":").map(Number);
+        const surahInfo = referenceData.aayahData.find(s => s.surah === surah);
+        if (!surahInfo) return null;
+
+        if (ayah < surahInfo.ayahEnd) {
+            return `${surah}:${ayah + 1}`;
+        } else {
+            if (surah === 114) return null;
+            return `${surah + 1}:1`;
+        }
+    };
+
+    const getPrevAyah = (input) => {
+        if (!input.includes(":")) {
+            return String(Number(input) - 1);
+        }
+
+        const [surah, ayah] = input.split(":").map(Number);
+
+        if (ayah > 1) {
+            return `${surah}:${ayah - 1}`;
+        } else {
+            if (surah === 1) return null;
+            const prevSurah = referenceData.aayahData.find(s => s.surah === surah - 1);
+            return `${surah - 1}:${prevSurah.ayahEnd}`;
+        }
+    };
+
     return (
         <motion.div
             initial={{ opacity: 0 }}
@@ -401,14 +434,36 @@ const API = () => {
                         <div className=" grid grid-cols-2 gap-2 text-black font-semibold">
                             <button
                                 onClick={() => {
-                                    const newValue = Number(value) - 1;
+                                    let newValue;
+
+                                    if (activeTab === "aayah") {
+                                        newValue = getPrevAyah(value);
+                                    } else {
+                                        newValue = Number(value) - 1;
+                                    }
+
+                                    if (!newValue) return;
+
                                     setValue(newValue);
                                     handleSearchWithValue(newValue);
                                 }}
-                                className="rounded-lg bg-yellow-400 hover:bg-yellow-500 h-10">prev</button>
+                                className="rounded-lg bg-yellow-400 hover:bg-yellow-500 h-10"
+                            >
+                                prev
+                            </button>
+
                             <button
                                 onClick={() => {
-                                    const newValue = Number(value) + 1;
+                                    let newValue;
+
+                                    if (activeTab === "aayah") {
+                                        newValue = getNextAyah(value);
+                                    } else {
+                                        newValue = Number(value) + 1;
+                                    }
+
+                                    if (!newValue) return;
+
                                     setValue(newValue);
                                     handleSearchWithValue(newValue);
                                 }}
