@@ -416,7 +416,7 @@ const API = () => {
                     {/* Input */}
                     <div className="flex flex-col sm:flex-row gap-4">
                         <input
-                            type="number"
+                            type="text"
                             value={value}
                             onChange={(e) => setValue(e.target.value)}
                             placeholder={currentTab.placeholder}
