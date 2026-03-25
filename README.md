@@ -207,7 +207,7 @@ git push origin feature/AmazingFeature
 
 [![Portfolio](https://img.shields.io/badge/🌐_Portfolio-syedanas.me-00D9FF?style=for-the-badge)](https://syedanas.me)
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-Connect-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/in/-syedanas)
-[![Gmail](https://img.shields.io/badge/Gmail-Contact-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:anasannu44455@gmail.com)
+[![Gmail](https://img.shields.io/badge/Gmail-Contact-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](mailto:sdanasbtech@gmail.com)
 
 📍 **India** · 🕐 **IST (UTC+5:30)** · ✅ **Open for Opportunities**
 
